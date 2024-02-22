@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Send File</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+        function encrypt(){
+        var tid= document.getElementById('text_data').value;
+
+        $.ajax({
+        type:"POST",
+        url : '{% url 'encrypt_data' %}',
+        data:{
+        'tid':tid,
+        },
+        success:
+        function(result){
+        document.getElementById('result').innerHTML= result;
+        document.getElementById('download_report').click();
+
+        },
+        headers:{"X-CSRFToken":"{{ csrf_token}}"},
+        })
+        }
+
+        function decrypt(){
+    $.ajax({
+        type:"POST",
+        url : '{% url 'decrypt' %}',
+        data:{
+        },
+        success:
+        function(result){
+
+            document.getElementById('de_result').innerHTML= result;
+        },
+        headers:{"X-CSRFToken":"{{ csrf_token}}"},
+        });
+    }
+
+    </script>
+</head>
+<body>
+<div>
+    <div id="Encrypted">
+    <h1>Create Encrypted Data</h1>
+    <textarea id="text_data" placeholder="Enter the text to be encrypted" maxlength="2100" required></textarea>
+    <button type="submit" onclick="encrypt()">Submit</button>
+    <a id="download_report" href="{% static 'qrcode.png' %}" style="display:none;" download></a>
+    <textarea id="result" placeholder="Encrypted Data" maxlength="2100" readonly></textarea>
+    </div>
+    <div id="Decrypted">
+    <h1>Get Decrypted Data</h1>
+    <p>Upload QR Code:</p>
+    <form method="post" enctype="multipart/form-data" action="uploadqr">
+            {% csrf_token %}
+                <input type="file" name="upload" accept="image/png">
+                <br>
+                <button class="btn btn-dark my-4" type="submit">Submit</button>
+    </form>
+    <button onclick="decrypt()">Decrypt</button>
+    <textarea id="de_result" placeholder="Final Data" readonly></textarea>
+    <button><a href="{% url 'handelLogout' %}">Logout</a></button>
+    </div>
+</div>
+</body>
+</html>
